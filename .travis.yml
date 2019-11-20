@@ -1,0 +1,26 @@
+sudo: required
+services:
+  - docker
+
+before_install:
+  # Build test version of client project (we could easily build images of other projects for testing).
+  - docker build -t zigavucko/multi-docker-client-test -f ./client/Dockerfile.dev ./client
+
+script:
+  # If any of the scripts exit with a status code other than zero, then Travis CI is going to assume that the build failed.
+  # `-e CI=true` argument will force Jest to run in CI-mode, and tests will only run once instead of launching the watcher.
+  - docker run -e CI=true zigavucko/multi-docker-client-test yarn test --coverage
+
+after_success:
+  # Build images.
+  - docker built -t zigavucko/multi-docker-nginx ./nginx
+  - docker built -t zigavucko/multi-docker-client ./client
+  - docker built -t zigavucko/multi-docker-server ./server
+  - docker built -t zigavucko/multi-docker-worker ./worker
+  # Log in to the Docker CLI.
+  - echo "$DOCKER_PASSWORD"| docker login -u "$DOCKER_ID" --password-stdin
+  # Push built images to Docker Hub.
+  - docker push zigavucko/multi-docker-nginx
+  - docker push zigavucko/multi-docker-client
+  - docker push zigavucko/multi-docker-server
+  - docker push zigavucko/multi-docker-worker
