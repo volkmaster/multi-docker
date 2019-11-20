@@ -13,10 +13,10 @@ script:
 
 after_success:
   # Build images.
-  - docker built -t zigavucko/multi-docker-nginx ./nginx
-  - docker built -t zigavucko/multi-docker-client ./client
-  - docker built -t zigavucko/multi-docker-server ./server
-  - docker built -t zigavucko/multi-docker-worker ./worker
+  - docker build -t zigavucko/multi-docker-nginx ./nginx
+  - docker build -t zigavucko/multi-docker-client ./client
+  - docker build -t zigavucko/multi-docker-server ./server
+  - docker build -t zigavucko/multi-docker-worker ./worker
   # Log in to the Docker CLI.
   - echo "$DOCKER_PASSWORD"| docker login -u "$DOCKER_ID" --password-stdin
   # Push built images to Docker Hub.
